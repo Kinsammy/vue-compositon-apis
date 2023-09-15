@@ -1,22 +1,28 @@
 <template>
     <div>
-        <h1>Options API</h1>
+        <h2>Options API</h2>
         <input type="text" placeholder="Name" v-model="name"  />
     </div>
     <h1>Composition API</h1>
     <div>
-        <h1>ref and watch function</h1>
+        <h2>ref and watch function</h2>
         <input type="text" placeholder="First Name" v-model="fName"  />
         <input type="text" placeholder="Last Name" v-model="lName"  />
     </div>
-    <!-- <div>
-        <h1>ref and watch function</h1>
-        <input type="text" placeholder="Name" v-model="name"  />
-    </div> -->
+    <div>
+        <h2>reactive function and watch function</h2>
+        <input type="text" placeholder="First Name" v-model="firstName"  />
+        <input type="text" placeholder="Last Name" v-model="lastName"  />
+    </div>
+    <div>
+        <h1>Deep Watcher</h1>
+        <input type="text" placeholder="Hero Name" v-model="options.heroName"  />
+    </div>
 </template>
 
 <script>
-import { ref, watch   } from 'vue'; 
+import { ref, watch, reactive, toRefs} from 'vue'; 
+import _ from 'lodash'
     export default {
         name: "Watch",
         // Options API
@@ -46,9 +52,43 @@ import { ref, watch   } from 'vue';
                 immediate: true
             })
 
+            // Using reactive function and toRefs 
+            const state = reactive({
+                firstName: '',
+                lastName: ''
+            })
+
+            watch( () => {
+            return { ...state }
+            },
+            function(newValue, oldValue){
+                console.log("First Name Old value", oldValue.firstName)
+                console.log("First Name New value", newValue.firstName)
+                console.log("Last Name Old value", oldValue.lastName)
+                console.log("Last Name New value", newValue.lastName)
+            })
+
+            // Deep watcher using lodash
+            const profile = reactive({
+                options: {
+                    heroName: ''
+                }
+            })
+
+            watch( 
+                () => _.cloneDeep(profile.options),
+                function(newValue, oldValue){
+                    console.log("Hero Name Old value", oldValue.heroName)
+                    console.log("Hero Name New value", newValue.heroName)
+            },{
+                deep: true
+            })
+
             return {
                 fName,
-                lName
+                lName,
+                ...toRefs(state),
+                ...toRefs(profile)
             }
         }
         
